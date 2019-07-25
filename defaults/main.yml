@@ -1,1 +1,11 @@
 # Defaults variables for role vbox-host
+# this role will setup VirtualBox to be used in headless mode
+# VMs will be created later through vboxmanage
+
+# VirtualBox version/pkgs to install
+vbox_ver: 6.0.10
+vbox_pkg: VirtualBox-6.0-6.0.10_132072_el7-1.x86_64.rpm
+vbox_ext_pkg: Oracle_VM_VirtualBox_Extension_Pack-6.0.10.vbox-extpack
+
+# Default directory where to create the .vdi storage files
+vbox_store_dir: /srv/vboxdisks

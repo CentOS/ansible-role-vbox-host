@@ -1,1 +1,36 @@
 # Defaults tasks for role vbox-host
+- name: Ensuring we have a path to store VDI disks files
+  file:
+    path: "{{ vbox_store_dir }}"
+    state: directory
+
+- name: Ensure we have local pkgs
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - gcc
+    - make
+    - kernel-devel
+
+- name: Downloading VirtualBox
+  get_url:
+    url: "{{ item }}"
+    dest: /var/tmp/
+  with_items:
+    - "https://download.virtualbox.org/virtualbox/{{ vbox_ver }}/{{ vbox_pkg }}"
+    - "https://download.virtualbox.org/virtualbox/{{ vbox_ver}}/{{ vbox_ext_pkg }}"
+
+- name: Installing VirtualBox
+  yum:
+    name: "/var/tmp/{{ vbox_pkg }}"
+    state: installed
+  register: vbox_pkg_install
+
+- name: Compiling vbox kernel modules
+  shell: /sbin/rcvboxdrv setup
+  when: vbox_pkg_install is changed
+
+- name: Adding vbox extpack (needed for pxe boot)
+  shell: echo y|vboxmanage extpack install /var/tmp/{{ vbox_ext_pkg }} --replace
+  when: vbox_pkg_install is changed
